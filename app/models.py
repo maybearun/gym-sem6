@@ -25,7 +25,7 @@ class Employee(Base):
     state=Column(String(255),nullable=False)
     zip_code=Column(String(6),nullable=False)
     primary_phone=Column(String(10),nullable=False,unique=True)
-    addtional_phone=Column(String(10),nullable=True,default="na")
+    additional_phone=Column(String(10),nullable=True,default="na")
     emergency_contact_name=Column(String(255),nullable=False)
     emergency_contact_phone=Column(String(255),nullable=False)
     photograph=Column(String(255),nullable=False)

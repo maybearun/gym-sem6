@@ -41,6 +41,7 @@ class CreateEmp(BaseModel):
     last_name:str
     date_of_birth:date
     address:str
+    state:str
     zip_code:str
     primary_phone:str
     additional_phone:str
