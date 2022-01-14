@@ -3,7 +3,7 @@ from sqlalchemy.sql.functions import mode
 from starlette.responses import Response
 from ..database import get_db
 from .. import models,schemas,utils
-from sqlalchemy.orm import Session, query
+from sqlalchemy.orm import Session
 from typing import List
 
 router=APIRouter(prefix="/admin",tags=['admin'])
@@ -11,6 +11,12 @@ router=APIRouter(prefix="/admin",tags=['admin'])
 # dashboard endpoint
 # @router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.UserOut)
 # def home()
+
+#get employees
+@router.get("/employees")
+def get_employees(db:Session=Depends(get_db)):
+    get_emp=db.query(models.Employee).all()
+    return get_emp
 
 #create_user
 @router.post("/employees",status_code=status.HTTP_201_CREATED)
@@ -41,28 +47,53 @@ def create_employees(payload:schemas.CreateEmp,db:Session=Depends(get_db)):
     db.refresh(users)
     invalid=["email_id","password"]
     new_dict=utils.without_keys(payload.dict(),invalid)
-    print(new_dict)
+    # print(new_dict)
     find_sal=new_dict['emp_type']
     query=db.query(models.Salary).filter(models.Salary.emp_type ==find_sal).first()
     print(query.salary_id)
     new_dict.pop("emp_type")
     new_dict['user_id']=users.user_id
     new_dict['salary_id']=query.salary_id
-    print(new_dict)
+    # print(new_dict)
     employee=models.Employee(**new_dict)
-    query=db.add(employee)
-    print(employee)
+    db.add(employee)
+    # print(employee)
     db.commit()
     db.refresh(employee)
     return employee
 
+@router.put("/employees/{id}")
+def update_emp(id:int,payload:schemas.CreateEmp,db:Session=Depends(get_db)):
 
+    update_emp=db.query(models.Employee).filter(models.Employee.employee_id==id).first()
+    if not update_emp:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"the employee with id {id} was not found")
+   
+    hashed_password=utils.hashed(payload.password)
+    payload.password=hashed_password
+    user_id=update_emp.user_id
+    db.query(models.Users).filter(models.Users.user_id==user_id).update({"email_id":payload.email_id,"password":payload.password})
+    db.commit()
+
+    invalid=["email_id","password"]
+    new_dict=utils.without_keys(payload.dict(),invalid)
+    # print(new_dict)
+    find_sal=new_dict['emp_type']
+    query=db.query(models.Salary).filter(models.Salary.emp_type ==find_sal).first()
+    print(query.salary_id)
+    new_dict.pop("emp_type")
+    new_dict['salary_id']=query.salary_id
+    print(new_dict)
+    updated_emp=db.query(models.Employee).filter(models.Employee.employee_id==id)
+    updated_emp.update(new_dict,synchronize_session=False)
+    return updated_emp.first()
+
+#salaries
 @router.get("/salaries",response_model=List[schemas.SalaryOut])
 def get_salaries(db:Session=Depends(get_db)):
     get_sal=db.query(models.Salary).all()
     # print(get_sal)
     return get_sal
-
 
 @router.post("/salaries",status_code=status.HTTP_201_CREATED)
 def create_salary(payload:schemas.CreateSalary,db:Session=Depends(get_db)):
@@ -84,7 +115,7 @@ def update_salary(id:int,payload:schemas.CreateSalary,db:Session=Depends(get_db)
     if update_sal.first()== None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"the salary with id {id} was not found")
     
-    update_sal.update(payload.dict())
+    update_sal.update(payload.dict(),synchronize_session=False)
     db.commit()
     return update_sal.first()
 
