@@ -62,8 +62,9 @@ def create_employees(payload:schemas.CreateEmp,db:Session=Depends(get_db)):
     db.refresh(employee)
     return employee
 
+
 @router.put("/employees/{id}")
-def update_emp(id:int,payload:schemas.CreateEmp,db:Session=Depends(get_db)):
+def update_employees(id:int,payload:schemas.CreateEmp,db:Session=Depends(get_db)):
 
     update_emp=db.query(models.Employee).filter(models.Employee.employee_id==id).first()
     if not update_emp:
@@ -87,6 +88,16 @@ def update_emp(id:int,payload:schemas.CreateEmp,db:Session=Depends(get_db)):
     updated_emp=db.query(models.Employee).filter(models.Employee.employee_id==id)
     updated_emp.update(new_dict,synchronize_session=False)
     return updated_emp.first()
+
+@router.delete("/employees/{id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_employees(id:int,db:Session=Depends(get_db)):
+    del_emp=db.query(models.Employee).filter(models.Employee.employee_id==id).first()
+    if not del_emp:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"the employee with the id {id} was not found")
+    del_user=db.query(models.Users).filter(models.Users.user_id==del_emp.user_id)
+    del_user.delete(synchronize_session=False)
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 #salaries
 @router.get("/salaries",response_model=List[schemas.SalaryOut])
