@@ -1,25 +1,22 @@
 from fastapi import APIRouter,HTTPException,status,Depends
 from sqlalchemy.sql.functions import mode
 from starlette.responses import Response
-from ..database import get_db
-from .. import models,schemas,utils
+from app.database import get_db
+from app import models,schemas,utils
 from sqlalchemy.orm import Session
 from typing import List
 
-router=APIRouter(prefix="/admin",tags=['admin'])
+router=APIRouter(prefix="/admin/employees",tags=['employees'])
 
-# dashboard endpoint
-# @router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.UserOut)
-# def home()
 
 #get employees
-@router.get("/employees")
+@router.get("/")
 def get_employees(db:Session=Depends(get_db)):
     get_emp=db.query(models.Employee).all()
     return get_emp
 
 #create_user
-@router.post("/employees",status_code=status.HTTP_201_CREATED)
+@router.post("/",status_code=status.HTTP_201_CREATED)
 def create_employees(payload:schemas.CreateEmp,db:Session=Depends(get_db)):
 
     # check for email duplication
@@ -63,7 +60,7 @@ def create_employees(payload:schemas.CreateEmp,db:Session=Depends(get_db)):
     return employee
 
 
-@router.put("/employees/{id}")
+@router.put("/{id}")
 def update_employees(id:int,payload:schemas.CreateEmp,db:Session=Depends(get_db)):
 
     update_emp=db.query(models.Employee).filter(models.Employee.employee_id==id).first()
@@ -89,7 +86,7 @@ def update_employees(id:int,payload:schemas.CreateEmp,db:Session=Depends(get_db)
     updated_emp.update(new_dict,synchronize_session=False)
     return updated_emp.first()
 
-@router.delete("/employees/{id}",status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_employees(id:int,db:Session=Depends(get_db)):
     del_emp=db.query(models.Employee).filter(models.Employee.employee_id==id).first()
     if not del_emp:
@@ -99,44 +96,3 @@ def delete_employees(id:int,db:Session=Depends(get_db)):
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-#salaries
-@router.get("/salaries",response_model=List[schemas.SalaryOut])
-def get_salaries(db:Session=Depends(get_db)):
-    get_sal=db.query(models.Salary).all()
-    # print(get_sal)
-    return get_sal
-
-@router.post("/salaries",status_code=status.HTTP_201_CREATED)
-def create_salary(payload:schemas.CreateSalary,db:Session=Depends(get_db)):
-
-    query=db.query(models.Salary).filter(models.Salary.emp_type == payload.emp_type).first()
-    if query:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail=f"the type {payload.emp_type} already exists in the database.")
-
-    create_sal=models.Salary(**payload.dict())
-    db.add(create_sal)
-    db.commit()
-    db.refresh(create_sal)
-    return create_sal
-
-@router.put("/salaries/{id}",response_model=schemas.SalaryOut)
-def update_salary(id:int,payload:schemas.CreateSalary,db:Session=Depends(get_db)):
-    update_sal=db.query(models.Salary).filter(models.Salary.salary_id==id)
-    
-    if update_sal.first()== None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"the salary with id {id} was not found")
-    
-    update_sal.update(payload.dict(),synchronize_session=False)
-    db.commit()
-    return update_sal.first()
-
-@router.delete("/salaries/{id}",status_code=status.HTTP_204_NO_CONTENT)
-def delete_salary(id:int,db:Session=Depends(get_db)):
-    delete_sal=db.query(models.Salary).filter(models.Salary.salary_id==id)
-
-    if delete_sal.first()==None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"the salary with id {id} was not found")
-    
-    delete_sal.delete()
-    db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
