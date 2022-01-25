@@ -18,7 +18,8 @@ class UserOut(Users):
     last_name:str
     date_of_birth:str
     address:str
-    zip_code:date
+    date_of_birth:date
+    zip_code:str
     primary_phone:str
     additional_phone:str
     emergency_contact_name:str
@@ -27,6 +28,7 @@ class UserOut(Users):
     
     class Config:
         orm_model=True
+
 #for employee dashboard
 class EmpOut(UserOut):
     aadhar_no:str
@@ -76,3 +78,9 @@ class SalaryOut(BaseModel):
     
     class Config:
         orm_mode=True
+
+class CreatePayroll(BaseModel):
+    emp_id:int
+    account_id:int
+    transaction_id:str
+    

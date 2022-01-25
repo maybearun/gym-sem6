@@ -2,7 +2,7 @@ from sqlalchemy import Column,Integer,String,Boolean,TIMESTAMP,Enum,DECIMAL,Text
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import BigInteger
 from .database import Base
-from sqlalchemy.sql.expression import null, text
+from sqlalchemy.sql.expression import text
 
 class Users(Base):
     __tablename__="users"
@@ -31,14 +31,14 @@ class Employee(Base):
     photograph=Column(String(255),nullable=False)
     aadhar_no=Column(String(13),nullable=False,unique=True)
     pan_no=Column(String(10),nullable=False,unique=True)
-    designation=Column(Enum("admin","trainer","receptionist"),nullable=False)
+    designation=Column(Enum("admin","trainer","receptionist",name="designation_enum", create_type=False),nullable=False)
     timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     
 class Salary(Base):
     __tablename__="salary"
 
     salary_id=Column(Integer, primary_key=True, nullable=False)
-    emp_type=Column(Enum("full time", "part time", "contract"),nullable=False)
+    emp_type=Column(Enum("full time", "part time", "contract",name="emp_type_enum", create_type=False),nullable=False)
     salary=Column(DECIMAL(8,2),nullable=False)
     timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
 
@@ -70,3 +70,31 @@ class EmployeeAttendance(Base):
     emp_id=Column(Integer,ForeignKey("employees.employee_id",ondelete="CASCADE"),nullable=False)
     check_in_time=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     check_out_time=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
+
+#add the supplier model
+class Supplier(Base):
+    __tablename__= "supplier"
+
+    supplier_id=Column(Integer,primary_key=True, nullable=False)
+    supplier_name=Column(String(255),nullable=False)
+    supplier_phone=Column(String(255),nullable=False)
+    timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
+
+class Product(Base):
+    __tablename__="product"
+
+    product_id=Column(Integer,primary_key=True, nullable=False)
+    sup_id=Column(Integer,ForeignKey("supplier.supplier_id",ondelete="CASCADE"),nullable=False)
+    product_description=Column(Text,nullable=False)
+    product_price=Column(DECIMAL(10,2),nullable=False)
+    quantity=Column(Integer,nullable=False)
+    timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
+
+class CommunityMessage(Base):
+    __tablename__="community_message"
+
+    message_id=Column(Integer,primary_key=True, nullable=False)
+    message_title=Column(String(255),nullable=False)
+    message_description=Column(Text,nullable=False)
+    timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
+

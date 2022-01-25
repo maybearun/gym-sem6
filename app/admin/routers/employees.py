@@ -6,7 +6,7 @@ from app import models,schemas,utils
 from sqlalchemy.orm import Session
 from typing import List
 
-router=APIRouter(prefix="/admin/employees",tags=['employees'])
+router=APIRouter(prefix="/employees",tags=['employees'])
 
 
 #get employees
@@ -45,7 +45,7 @@ def create_employees(payload:schemas.CreateEmp,db:Session=Depends(get_db)):
     invalid=["email_id","password"]
     new_dict=utils.without_keys(payload.dict(),invalid)
     # print(new_dict)
-    find_sal=new_dict['emp_type']
+    find_sal=new_dict["emp_type"]
     query=db.query(models.Salary).filter(models.Salary.emp_type ==find_sal).first()
     print(query.salary_id)
     new_dict.pop("emp_type")

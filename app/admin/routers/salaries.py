@@ -6,7 +6,7 @@ from app import models,schemas,utils
 from sqlalchemy.orm import Session
 from typing import List
 
-router=APIRouter(prefix="/admin/salaries",tags=['salary'])
+router=APIRouter(prefix="/salaries",tags=['salary'])
 
 #salaries
 @router.get("/",response_model=List[schemas.SalaryOut])
