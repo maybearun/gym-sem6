@@ -88,6 +88,7 @@ class Product(Base):
     prodct_title=Column(String(255),nullable=False)
     product_description=Column(Text,nullable=False)
     product_price=Column(DECIMAL(10,2),nullable=False)
+    product_img=Column(String(),nullable=False,default='app\images\default.png')
     quantity=Column(Integer,nullable=False)
     timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
 
@@ -102,7 +103,7 @@ class CommunityMessage(Base):
 class OrderItem(Base):
     __tablename__="order_item"
 
-    id=Column(Integer,primary_key=True,nullable=False)
+    item_id=Column(Integer,primary_key=True,nullable=False)
     product_title=Column(String(255),nullable=False)
     product_id=Column(Integer,ForeignKey("product.product_id",ondelete="CASCADE"),nullable=False)
     product_description=Column(Text,nullable=False)
@@ -122,7 +123,7 @@ class Order(Base):
     timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
 
 class Payments(Base):
-    __tablename__="Payments"
+    __tablename__="payments"
 
     id=Column(Integer,primary_key=True,nullable=False)
     name=Column(String(255),nullable=False)
@@ -162,7 +163,7 @@ class Members(Base):
     timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     
 class MembershipSubscription(Base):
-    __tablename__="membership subscription"
+    __tablename__="membership_subscription"
 
     subscription_id=Column(Integer,primary_key=True,nullable=False)
     plan_name=Column(String(255),nullable=False)

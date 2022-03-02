@@ -5,7 +5,6 @@ Revises:
 Create Date: 2022-01-20 23:50:31.978372
 
 """
-from itertools import product
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql.expression import text
@@ -28,7 +27,7 @@ def upgrade():
     )
 
     op.create_table('salary',
-    sa.Column('salary_id',sa.Integer(),nullable=True,primary_key=True),
+    sa.Column('salary_id',sa.Integer(),nullable=False,primary_key=True),
     sa.Column('emp_type',sa.Enum('full time', 'part time', 'contract',name="emp_type_enum", create_type=False),nullable=False),
     sa.Column('salary',sa.DECIMAL(8,2),nullable=False),
     sa.Column('timestamp',sa.TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
@@ -95,6 +94,8 @@ def upgrade():
     sa.Column('supplier_id',sa.Integer(),nullable=False),
     sa.Column('product_title',sa.String(),nullable=False),
     sa.Column('product_description',sa.Text(),nullable=False),
+    sa.Column('product_price',sa.DECIMAL(10,2),nullable=False),
+    sa.Column('product_img',sa.String(),nullable=False, default='app\images\default.png'),
     sa.Column('quantity',sa.Integer(),nullable=False),
     sa.Column('timestamp',sa.TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     )
