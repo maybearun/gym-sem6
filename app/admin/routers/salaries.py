@@ -28,6 +28,14 @@ def create_salary(payload:schemas.CreateSalary,db:Session=Depends(get_db)):
     db.refresh(create_sal)
     return create_sal
 
+@router.get("/{id}")
+def get_salary_by_id(id:int,db:Session=Depends(get_db)):
+ 
+    result=db.query(models.Salary).filter(models.Salary.id==id).first()
+    if not result:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"the Salary with id {id} was not found")
+    return result
+
 @router.put("/{id}",response_model=schemas.SalaryOut)
 def update_salary(id:int,payload:schemas.CreateSalary,db:Session=Depends(get_db)):
     update_sal=db.query(models.Salary).filter(models.Salary.salary_id==id)

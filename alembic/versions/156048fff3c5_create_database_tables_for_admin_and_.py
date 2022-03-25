@@ -67,8 +67,10 @@ def upgrade():
     
     op.create_table('leave',
     sa.Column('leave_id',sa.Integer(),primary_key=True,nullable=False),
-    sa.Column('leave_title',sa.Integer(),nullable=False),
     sa.Column('employee_id',sa.Integer(),nullable=False),
+    sa.Column('leave_title',sa.String(),nullable=False),
+    sa.Column('leave_description',sa.Text(),nullable=False,default="pending"),
+    sa.Column('status',sa.Enum("pending", "accepted", "rejected",name="leave_status_type_enum", create_type=False),nullable=False,default="pending"),
     sa.Column('applied_for',sa.DATE(),nullable=False),
     sa.Column('timestamp',sa.TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     )

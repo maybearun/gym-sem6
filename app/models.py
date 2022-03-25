@@ -53,14 +53,15 @@ class Payroll(Base):
     timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
 
 
-class Leaves(Base):
+class Leave(Base):
     __tablename__="leave"
 
     leave_id=Column(Integer, primary_key=True, nullable=False)
     leave_title=Column(String(255),nullable=False)
-    emp_id=Column(Integer,ForeignKey("employees.employee_id",ondelete="CASCADE"),nullable=False)
-    leave_message=Column(Text,nullable=False)
+    employee_id=Column(Integer,ForeignKey("employees.employee_id",ondelete="CASCADE"),nullable=False)
+    leave_description=Column(Text,nullable=False)
     applied_for=Column(DATE,nullable=False)
+    status=Column(Enum("pending", "accepted", "rejected",name="leave_status_type_enum", create_type=False),nullable=False,default="pending")
     timestamp=Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
 
 class EmployeeAttendance(Base):
@@ -84,8 +85,8 @@ class Product(Base):
     __tablename__="product"
 
     product_id=Column(Integer,primary_key=True, nullable=False)
-    sup_id=Column(Integer,ForeignKey("supplier.supplier_id",ondelete="CASCADE"),nullable=False)
-    prodct_title=Column(String(255),nullable=False)
+    supplier_id=Column(Integer,ForeignKey("supplier.supplier_id",ondelete="CASCADE"),nullable=False)
+    product_title=Column(String(255),nullable=False)
     product_description=Column(Text,nullable=False)
     product_price=Column(DECIMAL(10,2),nullable=False)
     product_img=Column(String(),nullable=False,default='app\images\default.png')
@@ -148,7 +149,7 @@ class Members(Base):
     __tablename__="members"
 
     member_id=Column(Integer,primary_key=True,nullable=False)
-    user_id=Column(Integer,ForeignKey("user.user_id",ondelete="CASCADE"),nullable=False)
+    user_id=Column(Integer,ForeignKey("users.user_id",ondelete="CASCADE"),nullable=False)
     first_name=Column(String(255),nullable=False)
     last_name=Column(String(255),nullable=False)
     date_of_birth=Column(DATE,nullable=False)

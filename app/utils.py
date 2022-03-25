@@ -56,3 +56,14 @@ def store_file(user_type,upload_file,first_name):
     finally:
         upload_file.file.close()
     return os.path.relpath(destination)
+
+def check_if_member_exists(email_id,primary_phone,db):
+    # check for email duplication
+    query_email=db.query(models.Users).filter(models.Users.email_id==email_id).first()
+    if query_email:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail= f"an account with {email_id} already exist")
+    # check for phone no. duplication
+    query_phone=db.query(models.Members).filter(models.Members.primary_phone==primary_phone).first()
+    if query_phone:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail= f"an account with {primary_phone} already exist")
+    

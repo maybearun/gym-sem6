@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.admin import admin_main
+from app.members import member_main
 # from .trainers import trainer
 # from .receptionists import receptionist
 from . import models
@@ -26,4 +27,6 @@ app.add_middleware(
 # app.include_router(trainer.router)
 # app.include_router(receptionist.router)
 app.mount("/admin",admin_main.subapi)
+app.mount("/member",member_main.subapi)
+
 
